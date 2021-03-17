@@ -8,6 +8,8 @@
     "webpack:debug": "node --inspect-brk ./node_modules/.bin/webpack --inline --progress",
     "build": "cross-env NODE_ENV=prod webpack --config config/webpack.config.prod.js",
     "dev": "cross-env NODE_ENV=dev nodemon --exec babel-node --inspect ./src/index.js",
+    "watch": "cross-env NODE_ENV=development webpack --watch --progress --hide-modules --config config/webpack.config.dev.js",
+    "debug": "nodemon --inspect=9229 ./dist/server.bundle.js",
     "clean": "rimraf dist"
   },
   "keywords": [],
@@ -29,12 +31,15 @@
     "koa-jwt": "^3.6.0",
     "koa-router": "^7.4.0",
     "koa-static": "^5.0.0",
+    "make-dir": "^3.0.2",
     "moment": "^2.24.0",
     "mongoose": "^5.7.3",
     "nodemailer": "^6.3.0",
     "redis": "^2.8.0",
     "saslprep": "^1.0.3",
-    "svg-captcha": "^1.4.0"
+    "svg-captcha": "^1.4.0",
+    "uuid": "^3.3.3",
+    "ws": "^7.2.3"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",

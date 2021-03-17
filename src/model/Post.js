@@ -10,10 +10,10 @@ const PostSchema = new Schema({
   created: { type: Date },
   catalog: { type: String },
   fav: { type: String },
-  isEnd: { type: String, default: '0' },
+  isEnd: { type: String, default: '0' }, // 结帖状态
   reads: { type: Number, default: 0 },
   answer: { type: Number, default: 0 },
-  status: { type: String, default: '0' },
+  status: { type: String, default: '0' }, // 管理员打开回复
   isTop: { type: String, default: '0' },
   sort: { type: String, default: 100 },
   tags: {
@@ -75,7 +75,7 @@ PostSchema.statics = {
   // 根据uid取得用户的信息
   findByTid: function (id) {
     return this.findOne({ _id: id }).populate({
-      path: 'uid',
+      path: 'uid', // Post表的uid属性与User表映射,通过帖子id使用populate取我们需要的数据
       select: 'name pic isVip _id'
     })
   },

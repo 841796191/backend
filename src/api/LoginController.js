@@ -62,7 +62,7 @@ class LoginController {
 
         const userObj = user.toJSON()
         // 不想传回前端的数据
-        const arr = ['password', 'username', 'roles']
+        const arr = ['password', 'username']
         // 删除数据
         arr.map((item) => {
           delete userObj[item]
