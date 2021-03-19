@@ -50,32 +50,34 @@ UserSchema.statics = {
   },
   // 获取用户列表
   getList: function (options, sort, page, limit) {
-    // // 1. datepicker -> item: string, search -> array  startitme,endtime
-    // // 2. radio -> key-value $in
-    // // 3. select -> key-array $in
-    // let query = {}
-    // if (typeof options.search !== 'undefined') {
-    //   if (typeof options.search === 'string' && options.search.trim() !== '') {
-    //     if (['name', 'username'].includes(options.item)) {
-    //       // 模糊匹配
-    //       query[options.item] = { $regex: new RegExp(options.search) }
-    //       // =》 { name: { $regex: /admin/ } } => mysql like %admin%
-    //     } else {
-    //       // radio
-    //       query[options.item] = options.search
-    //     }
-    //   }
-    //   if (options.item === 'roles') {
-    //     query = { roles: { $in: options.search } }
-    //   }
-    //   if (options.item === 'created') {
-    //     const start = options.search[0]
-    //     const end = options.search[1]
-    //     query = { created: { $gte: new Date(start), $lt: new Date(end) } }
-    //   }
-    // }
+    // // 1. datepicker(时间) -> item: string, search -> array  startitme,endtime
+    // // 2. radio(键值对) -> key-value $in
+    // // 3. select(数组) -> key-array $in
+    let query = {}
+    // 判断是否有传搜索值,没有则直接返回全部数据
+    if (typeof options.search !== 'undefined') {
+      // 判断传递的搜索值是否为字符串类型
+      if (typeof options.search === 'string' && options.search.trim() !== '') {
+        if (['name', 'username'].includes(options.item)) {
+          // 模糊匹配
+          query[options.item] = { $regex: new RegExp(options.search) }
+          // => { name: { $regex: /admin/ } } => mysql like %admin%
+        } else {
+          // radio 禁言、vip
+          query[options.item] = options.search
+        }
+      }
+      if (options.item === 'roles') {
+        query = { roles: { $in: options.search } }
+      }
+      if (options.item === 'created') {
+        const start = options.search[0]
+        const end = options.search[1]
+        query = { created: { $gte: new Date(start), $lt: new Date(end) } }
+      }
+    }
     // 查找返回的信息屏蔽掉密码手机等信息
-    return this.find({...options}, { password:0, mobile: 0})
+    return this.find(query, { password:0, mobile: 0})
       .sort({ [sort]: -1 })
       .skip(page * limit)
       .limit(limit)

@@ -402,20 +402,20 @@ class UserController {
   // 管理删除用户信息
   async deleteUserById (ctx) {
     const { body } = ctx.request
-    const user = await User.findOne({ _id: body.ids })
-    if (user) {
-      const result = await User.deleteOne({ _id: body.ids })
+    // const user = await User.findOne({ _id: body.ids })
+    // if (user) {
+      const result = await User.deleteMany({ _id: { $in: body.ids } })
       ctx.body = {
         code: 200,
         msg: '删除成功',
         data: result
       }
-    } else {
-      ctx.body = {
-        code: 500,
-        msg: '用户不存在或id错误'
-      }
-    }
+    // } else {
+    //   ctx.body = {
+    //     code: 500,
+    //     msg: '用户不存在或id错误'
+    //   }
+    // }
   }
 
   // 校验用户名是否冲突
@@ -457,6 +457,19 @@ class UserController {
         code: 500,
         msg: '服务接口异常'
       }
+    }
+  }
+
+  // 管理批量设置
+  async updateUserBatch (ctx) {
+    const { body } = ctx.request
+    const result = await User.updateMany(
+      { _id: { $in: body.ids } },
+      { $set: { ...body.settings } }
+    )
+    ctx.body = {
+      code: 200,
+      data: result
     }
   }
 }
