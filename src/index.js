@@ -12,6 +12,11 @@ import compress from 'koa-compress'
 import config from './config/index'
 import errorHandle from './common/ErrorHandle' // 鉴权错误处理函数
 import WebSocketServer from './config/WebSocket'
+import auth from './common/Auth'
+import { run } from './common/init'
+// import logger from 'koa-logger' // 打印日志
+import log4js from './config/log4j' // 输出日志文件
+import monitorLogger from './common/Logger'
 
 const app = new koa()
 const ws = new WebSocketServer()
@@ -30,6 +35,7 @@ const jwt = JWT({secret: config.JWT_SECRET}).unless({ path: [/^\/public/, /\/log
 //param:'pretty'查询字符串中包含pretty时格式化响应
 // 例:xx.xx.com/api/api?name=lds&pretty
 const middleware = compose([
+  monitorLogger,
   koaBody({
     multipart: true, // 支持图片上传
     formidable: {
@@ -44,8 +50,10 @@ const middleware = compose([
   cors(),
   jsonutil({ pretty: false, param: 'pretty' }),
   helmet(),// 设置安全的headers
+  auth,
   errorHandle,
-  jwt
+  jwt,
+  log4js.koaLogger(log4js.getLogger('access'), { level: 'auto' })
 ])
 
 if (!isDevMode) {
@@ -55,4 +63,6 @@ if (!isDevMode) {
 app.use(middleware)
 app.use(router())
 
-app.listen(3000)
+app.listen(3000, () => {
+  run()
+})

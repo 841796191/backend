@@ -1,5 +1,5 @@
 import SignRecord from '../model/SignRecord'
-import { getJWtPayload } from '../common/Utils'
+import { getJWtPayload, checkCode } from '../common/Utils'
 import User from '../model/User'
 import Comments from '../model/Comments'
 import UserCollect from '../model/UserCollect'
@@ -11,8 +11,80 @@ import { setValue, getValue } from '../config/RedisConfig'
 import config from '../config/index'
 import bcryptjs from 'bcryptjs'
 import qs from 'qs'
+import jsonwebtoken from 'jsonwebtoken'
 
 class UserController {
+  // 管理员登录
+  async login (ctx) {
+    // 接收用户数据
+    // 验证图片验证码时效性、正确性
+    // 验证用户账号密码是否正确
+    // 返回token
+    const { body } = ctx.request
+    let sid = body.sid // 前端传递sid查找对应验证码
+    let code = body.code
+    
+    // 校验验证码
+    let result = await checkCode(sid, code)
+    // console.log('result: ',result)
+    if(result){
+      // 验证用户账号密码是否正确
+      console.log('check')
+      let checkUserPassWd = false
+      // mongoDB查库
+      let user = await User.findOne({username: body.username})
+      // console.log('user: ',user)
+      // 判断是否为管理员
+      if (user.roles.includes('admin') || user.roles.includes('super_admin')) {
+            // 校验密码
+          if(await bcryptjs.compare(body.password, user.password)){
+            checkUserPassWd = true
+          }
+          if(checkUserPassWd){
+            // 验证通过,返回token数据
+            console.log('hello login')
+
+            const userObj = user.toJSON()
+            // 不想传回前端的数据
+            const arr = ['password', 'username']
+            // 删除数据
+            arr.map((item) => {
+              delete userObj[item]
+            })
+            // exp 设置token过期时间
+            // let token = jsonwebtoken.sign({_id:'brian', exp: Math.floor(Date.now() / 1000) + 60 * 60 *24}, config.JWT_SECRET)
+            let token = jsonwebtoken.sign({_id: userObj._id}, config.JWT_SECRET, {
+              expiresIn: '1d' // 另一种设置过期时间方法,1d为1天
+            })
+
+            ctx.body = {
+              code: 200,
+              data: userObj,
+              token: token
+            }
+          } else {
+            // 用户名、密码验证失败,返回提示
+            ctx.body = {
+              code: 404,
+              msg: '用户名或密码错误'
+            }
+          }  
+        } else {
+          // 图片验证码校验失败
+          ctx.body = {
+            code: 404,
+            msg: '不是管理员,无法登录后台'
+          }
+        }
+    // console.log('hello login')
+  } else {
+    ctx.body = {
+      code: 401,
+      msg: '验证码错误'
+    }
+  }
+}
+
   // 用户签到接口
   async userSign (ctx) {
     // 从token取用户ID,jsonwebtoken返回一个promise对象
@@ -288,7 +360,7 @@ class UserController {
   // 获取用户基本信息
   async getBasicInfo (ctx) {
     const params = ctx.query
-    const obj = await getJWtPayload(ctx.header.authorization)
+    // const obj = await getJWtPayload(ctx.header.authorization)
     const uid = params.uid || ctx._id
     let user = await User.findByID(uid || obj._id)
     // 取得用户的签到记录 看日期有没有大于今天 0:00:00 的

@@ -17,5 +17,6 @@ router.post('/update', contentController.updatePost)
 router.post('/updateId', contentController.updatePostByTid)
 // 管理删除帖子
 router.get('/delete', contentController.deletePost)
-
+// 管理批量更新
+router.post('/updatePostSettings', contentController.updatePostBatch)
 export default router

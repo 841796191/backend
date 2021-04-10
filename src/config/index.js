@@ -6,10 +6,17 @@ const JWT_SECRET = 'agdvabgmhgnfrvedfcaerqf'
 const baseUrl = 'http://localhost:8081'
 const uploadPath = path.join(path.resolve(__dirname), '../../public')
 
+const isAdminEmain = ['lds@toimc.com']
+// const publicPath = [/^\/public/, /^\/login/, /^\/content/, /^\/user/]
+const publicPath = [/^\/public/, /^\/login/]
+const isDevMode = process.env.NODE_ENV === 'development'
 export default {
   DB_URL,
   DB_URL2,
   JWT_SECRET,
   baseUrl,
-  uploadPath
+  uploadPath,
+  isAdminEmain,
+  publicPath,
+  isDevMode
 }

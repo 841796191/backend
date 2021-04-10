@@ -429,6 +429,7 @@ class ContentController {
     }
   }
 
+  // 更新标签
   async updateTag (ctx) {
     const { body } = ctx.request
     const result = await PostTags.updateOne(
@@ -440,6 +441,19 @@ class ContentController {
       code: 200,
       data: result,
       msg: '更新成功'
+    }
+  }
+
+  // 批量更新
+  async updatePostBatch (ctx) {
+    const { body } = ctx.request
+    const result = await Post.updateMany(
+      { _id: { $in: body.ids } },
+      { $set: { ...body.settings } }
+    )
+    ctx.body = {
+      code: 200,
+      data: result
     }
   }
 }

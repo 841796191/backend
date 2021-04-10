@@ -7,6 +7,7 @@ import commentsController from '../../api/CommentsController'
 const router = new Router()
 
 router.prefix('/public')
+router.post('/adminlogin', userController.login)
 // 图片验证码
 router.get('/getCaptcha', publicController.getCaptcha)
 
