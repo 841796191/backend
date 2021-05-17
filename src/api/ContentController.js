@@ -41,7 +41,7 @@ class ContentController {
     if (typeof body.tag !== 'undefined' && body.tag !== '') {
       options.tags = { $elemMatch: { name: body.tag } }
     }
-    // console.log('options:',options)
+    // 根据条件查询数据库
     const result = await Post.getList(options, sort, page, limit)
     const total = await Post.countList(options)
 
@@ -226,8 +226,6 @@ class ContentController {
         msg: '获取文章详情失败'
       }
     }
-    // const post = await Post.findOne({ _id: params.tid })
-    // const result = rename(post.toJSON(), 'uid', 'user')
   }
 
   // 更新帖子

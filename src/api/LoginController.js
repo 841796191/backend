@@ -33,19 +33,17 @@ class LoginController {
     }
   }
 
+  // 接收用户数据
+  // 验证图片验证码时效性、正确性
+  // 验证用户账号密码是否正确
+  // 返回token
   async login (ctx) {
-    // 接收用户数据
-    // 验证图片验证码时效性、正确性
-    // 验证用户账号密码是否正确
-    // 返回token
-
     const { body } = ctx.request
     let sid = body.sid // 前端传递sid查找对应验证码
     let code = body.code
     
     // 校验验证码
     let result = await checkCode(sid, code)
-    
     if(result){
       // 验证用户账号密码是否正确
       console.log('check ok')
@@ -58,8 +56,6 @@ class LoginController {
       }
       if(checkUserPassWd){
         // 验证通过,返回token数据
-        console.log('hello login')
-
         const userObj = user.toJSON()
         // 不想传回前端的数据
         const arr = ['password', 'username']
@@ -75,6 +71,7 @@ class LoginController {
 
         // 加入isSign属性
         const signRecord = await SignRecord.findByUid(userObj._id)
+        // 判断今日是否签到
         if (signRecord !== null) {
           // 有签到记录,判断今天是否签到了
           if (moment(signRecord.created).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD')) {
@@ -109,7 +106,6 @@ class LoginController {
         msg: '图片验证码不正确,请检查'
       }
     }
-    // console.log('hello login')
   }
 
   async reg (ctx) {
